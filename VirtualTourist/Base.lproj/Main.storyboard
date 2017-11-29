@@ -20,6 +20,10 @@
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="sJr-rc-mN2">
                                 <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="zS0-V1-8GR" appends="YES" id="lWP-Hb-BIg"/>
+                                </connections>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -35,10 +39,46 @@
                     </view>
                     <connections>
                         <outlet property="mapView" destination="sJr-rc-mN2" id="mo8-9f-SL6"/>
+                        <segue destination="3D4-P1-RRd" kind="presentation" identifier="albumSegue" id="1Cl-su-9zk"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="zS0-V1-8GR">
+                    <connections>
+                        <action selector="longPressWithRecognizer:" destination="BYZ-38-t0r" id="IQn-pK-yIP"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
+        </scene>
+        <!--Album View Controller-->
+        <scene sceneID="6xA-4b-Cy2">
+            <objects>
+                <viewController id="3D4-P1-RRd" customClass="AlbumViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Zni-WX-z3h">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fj8-jL-dLk">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <items>
+                                    <navigationItem title="Title" id="Tpm-06-GRq">
+                                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="lc5-7S-hPs">
+                                            <connections>
+                                                <action selector="goBack:" destination="3D4-P1-RRd" id="a6L-98-0wa"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="xfx-i3-Kck"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rqR-PI-yhm" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1116" y="39"/>
         </scene>
     </scenes>
 </document>

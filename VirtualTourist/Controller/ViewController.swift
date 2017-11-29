@@ -28,11 +28,6 @@ class ViewController: UIViewController, MKMapViewDelegate {
         
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         
         UserDefaults.standard.set(mapView.region.center.latitude, forKey: "centerLat")
@@ -40,6 +35,30 @@ class ViewController: UIViewController, MKMapViewDelegate {
         UserDefaults.standard.set(mapView.region.span.latitudeDelta, forKey: "latDelta")
         UserDefaults.standard.set(mapView.region.span.longitudeDelta, forKey: "longDelta")
         
+    }
+    
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        print("Annotation is selected")
+        
+        performSegue(withIdentifier: "albumSegue", sender: self)
+
+    }
+    
+    
+    @IBAction func longPress(recognizer:UILongPressGestureRecognizer) {
+        if recognizer.state == UIGestureRecognizerState.ended {
+            print("long press")
+            
+            let location = recognizer.location(in: mapView)
+            let coordinate = mapView.convert(location,toCoordinateFrom: mapView)
+            
+            // Add annotation:
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            mapView.addAnnotation(annotation)
+            
+            
+        }
     }
     
 }
