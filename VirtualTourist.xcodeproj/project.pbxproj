@@ -97,8 +97,10 @@
 		22199E211FCECD66002119E0 /* VirtualTourist */ = {
 			isa = PBXGroup;
 			children = (
+				22199E521FCED000002119E0 /* Controller */,
+				22199E511FCECFFA002119E0 /* Model */,
+				22199E501FCECFEE002119E0 /* View */,
 				22199E221FCECD66002119E0 /* AppDelegate.swift */,
-				22199E241FCECD66002119E0 /* ViewController.swift */,
 				22199E261FCECD66002119E0 /* Main.storyboard */,
 				22199E291FCECD66002119E0 /* Assets.xcassets */,
 				22199E2B1FCECD66002119E0 /* LaunchScreen.storyboard */,
@@ -123,6 +125,28 @@
 				22199E441FCECD66002119E0 /* Info.plist */,
 			);
 			path = VirtualTouristUITests;
+			sourceTree = "<group>";
+		};
+		22199E501FCECFEE002119E0 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		22199E511FCECFFA002119E0 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		22199E521FCED000002119E0 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				22199E241FCECD66002119E0 /* ViewController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
