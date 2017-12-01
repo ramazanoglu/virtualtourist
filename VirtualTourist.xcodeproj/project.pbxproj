@@ -24,6 +24,7 @@
 		227CDBE81FD03B5F0037B3FF /* Pin+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227CDBE41FD03B5F0037B3FF /* Pin+CoreDataProperties.swift */; };
 		227CDBE91FD03B5F0037B3FF /* Image+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227CDBE51FD03B5F0037B3FF /* Image+CoreDataClass.swift */; };
 		227CDBEA1FD03B5F0037B3FF /* Image+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227CDBE61FD03B5F0037B3FF /* Image+CoreDataProperties.swift */; };
+		22D651941FD1612200FBA093 /* FlickrCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D651931FD1612200FBA093 /* FlickrCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		227CDBE41FD03B5F0037B3FF /* Pin+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		227CDBE51FD03B5F0037B3FF /* Image+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+CoreDataClass.swift"; sourceTree = "<group>"; };
 		227CDBE61FD03B5F0037B3FF /* Image+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		22D651931FD1612200FBA093 /* FlickrCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +153,7 @@
 		22199E501FCECFEE002119E0 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				22D651931FD1612200FBA093 /* FlickrCollectionViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -324,6 +327,7 @@
 				227CDBE71FD03B5F0037B3FF /* Pin+CoreDataClass.swift in Sources */,
 				22199E581FCF116D002119E0 /* Constants.swift in Sources */,
 				22199E541FCEF5FF002119E0 /* AlbumViewController.swift in Sources */,
+				22D651941FD1612200FBA093 /* FlickrCollectionViewCell.swift in Sources */,
 				227CDBEA1FD03B5F0037B3FF /* Image+CoreDataProperties.swift in Sources */,
 				227CDBE81FD03B5F0037B3FF /* Pin+CoreDataProperties.swift in Sources */,
 				22199E251FCECD66002119E0 /* ViewController.swift in Sources */,

@@ -25,7 +25,7 @@ class FlickrClient : NSObject {
             Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
             Constants.FlickrParameterKeys.Lat: String(pin.latitude),
             Constants.FlickrParameterKeys.Lon: String(pin.longitude),
-            Constants.FlickrParameterKeys.Page: String("3"),
+            Constants.FlickrParameterKeys.Page: String(pin.lastPage),
             Constants.FlickrParameterKeys.PerPage: String("50")
             
             
