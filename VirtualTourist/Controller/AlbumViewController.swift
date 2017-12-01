@@ -35,7 +35,7 @@ class AlbumViewController: UIViewController {
                         self.stack.save()
                         
                     }
-                    
+
                 }))
                 
             } else {
@@ -89,7 +89,7 @@ class AlbumViewController: UIViewController {
 }
 
 fileprivate let itemsPerRow: CGFloat = 3
-fileprivate let sectionInsets = UIEdgeInsets(top: 50.0, left: 20.0, bottom: 50.0, right: 20.0)
+fileprivate let sectionInsets = UIEdgeInsets(top: 20.0, left: 20.0, bottom: 20.0, right: 20.0)
 
 
 extension AlbumViewController : UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -100,6 +100,11 @@ extension AlbumViewController : UICollectionViewDelegate, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
+        let image = fetchedResultsController.object(at: indexPath) as! Image
+        
+        self.stack.context.delete(image)
+        stack.save()
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -108,9 +113,40 @@ extension AlbumViewController : UICollectionViewDelegate, UICollectionViewDataSo
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCell",
-                                                      for: indexPath)
-        cell.backgroundColor = UIColor.black
+                                                      for: indexPath) as! FlickrCollectionViewCell
+       
         // Configure the cell
+        
+        let image  = fetchedResultsController.object(at: indexPath) as! Image
+        
+        if image.imageData != nil {
+            cell.imageView.image = UIImage(data: (image.imageData! as Data))
+        } else {
+            
+            print("Download image")
+            
+            FlickrClient.sharedInstance().downloadImage(url: image.url!, completionHandler: ({data, error in
+                
+                
+                if error == nil {
+                    
+                    performUIUpdatesOnMain {
+                        cell.imageView.image = UIImage(data: data!)
+
+                    }
+                    
+                    image.imageData = data! as NSData
+                    
+                    self.stack.save()
+        
+                }
+                
+                
+            }))
+            
+        }
+        
+        
         return cell
     }
     
@@ -151,6 +187,25 @@ extension AlbumViewController: NSFetchedResultsControllerDelegate {
                 print("Error while trying to perform a search: \n\(e)\n\(fetchedResultsController)")
             }
         }
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        switch(type) {
+        case .insert:
+            collectionView.insertItems(at: [newIndexPath!])
+        case .delete:
+            collectionView.deleteItems(at: [indexPath!])
+        case .update:
+            collectionView.reloadItems(at: [indexPath!])
+        case .move:
+            collectionView.deleteItems(at: [indexPath!])
+            collectionView.insertItems(at: [newIndexPath!])
+        }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        print("controllerDidChangeContent")
     }
     
 }

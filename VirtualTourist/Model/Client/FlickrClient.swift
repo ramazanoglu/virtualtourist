@@ -34,6 +34,30 @@ class FlickrClient : NSObject {
         
     }
     
+    func downloadImage(url: String, completionHandler: @escaping (_ data: Data?,_ error: String?) -> Void) {
+        
+        
+        let session = URLSession.shared
+        let request = URLRequest(url: URL(string: url)!)
+        
+        // create network request
+        let task = session.dataTask(with: request) { (data, response, error) in
+            
+            if error == nil {
+                
+                completionHandler(data, nil)
+                
+            } else {
+                print(error!)
+            }
+            
+            
+        }
+        
+        task.resume()
+        
+    }
+    
     private func queryImagesByLocation(_ methodParameters: [String: AnyObject], pin: Pin, completionHandler: @escaping (_ error: String?) -> Void) {
         
         // create session and request
@@ -134,7 +158,7 @@ class FlickrClient : NSObject {
                     
                     let image = Image(url: imageUrlString, title: photoTitle!, pin: pin, context: self.stack.context)
                     
-                   
+                    
                     
                 }
                 
