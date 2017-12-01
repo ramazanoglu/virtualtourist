@@ -8,10 +8,32 @@
 
 import UIKit
 import MapKit
+import CoreData
+
 
 class ViewController: UIViewController, MKMapViewDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
+    var selectedPin: Pin!
+    
+    var fetchedResultsController : NSFetchedResultsController<NSFetchRequestResult>! {
+        didSet {
+            fetchedResultsController.delegate = self
+            executeSearch()
+            fetchAllPins()
+        }
+    }
+    
+    var stack = (UIApplication.shared.delegate as! AppDelegate).stack
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "albumSegue" {
+            if let nextVC = segue.destination as? AlbumViewController {
+                nextVC.pin = self.selectedPin
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +48,12 @@ class ViewController: UIViewController, MKMapViewDelegate {
         
         mapView.setRegion(MKCoordinateRegionMake(CLLocationCoordinate2D(latitude: centerLat, longitude: centerLong), MKCoordinateSpanMake(latDelta, longDelta)), animated: true)
         
+        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        fr.sortDescriptors = []
+        
+        // Create the FetchedResultsController
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fr, managedObjectContext: stack.context, sectionNameKeyPath: nil, cacheName: nil)
+        
     }
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
@@ -38,16 +66,33 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        print("Annotation is selected")
         
-        performSegue(withIdentifier: "albumSegue", sender: self)
-
+        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        fr.sortDescriptors = []
+        
+        fr.predicate = NSPredicate(format: "latitude == %lf AND longitude == %lf", (view.annotation?.coordinate.latitude)!, (view.annotation?.coordinate.longitude)!)
+        
+        do {
+            let fetchedResults = try stack.context.fetch(fr) as! [Pin]
+            
+            print(fetchedResults.count)
+            
+            if let pin = fetchedResults.first {
+                print("\(pin)")
+                
+                self.selectedPin = pin
+            }
+        } catch {
+            print("catch")
+        }
+        
+         performSegue(withIdentifier: "albumSegue", sender: self)
+                
     }
     
     
     @IBAction func longPress(recognizer:UILongPressGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.ended {
-            print("long press")
             
             let location = recognizer.location(in: mapView)
             let coordinate = mapView.convert(location,toCoordinateFrom: mapView)
@@ -57,9 +102,46 @@ class ViewController: UIViewController, MKMapViewDelegate {
             annotation.coordinate = coordinate
             mapView.addAnnotation(annotation)
             
+            let pin = Pin(latitude: coordinate.latitude, longitude: coordinate.longitude, lastPage: 1, context: fetchedResultsController.managedObjectContext)
+            print("Added a new pin: \(pin)")
+            stack.save()
             
         }
     }
     
+    func fetchAllPins() {
+        //clear annotations
+        print("fetchAllPins \(fetchedResultsController.fetchedObjects?.count)")
+        
+        mapView.removeAnnotations(mapView.annotations)
+        
+        
+        
+        for pin in fetchedResultsController.fetchedObjects as! [Pin] {
+            print("pin found lat \(pin.latitude) long \(pin.longitude) page \(pin.lastPage)")
+            let annotation = MKPointAnnotation()
+            annotation.coordinate.latitude = CLLocationDegrees(pin.latitude)
+            annotation.coordinate.longitude = CLLocationDegrees(pin.longitude)
+            mapView.addAnnotation(annotation)
+        }
+    }
+    
 }
+
+extension ViewController: NSFetchedResultsControllerDelegate {
+    
+    func executeSearch() {
+        if let fc = fetchedResultsController {
+            do {
+                try fc.performFetch()
+            } catch let e as NSError {
+                print("Error while trying to perform a search: \n\(e)\n\(fetchedResultsController)")
+            }
+        }
+    }
+    
+}
+
+
+
 

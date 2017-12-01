@@ -7,12 +7,56 @@
 //
 
 import UIKit
+import CoreData
 
 class AlbumViewController: UIViewController {
-
+    
+    let stack = (UIApplication.shared.delegate as! AppDelegate).stack
+    
+    var fetchedResultsController : NSFetchedResultsController<NSFetchRequestResult>! {
+        didSet {
+            fetchedResultsController.delegate = self
+            executeSearch()
+            
+            if fetchedResultsController.fetchedObjects?.count == 0 {
+                
+                print("no data")
+                
+            } else {
+                print("Downloaded \(fetchedResultsController.fetchedObjects?.count)")
+            }
+            
+        }
+    }
+    
+    var pin: Pin!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        print("\(pin)")
+        
+        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Image")
+        fr.sortDescriptors = []
+        fr.predicate = NSPredicate(format: "pin == %@", self.pin)
+        // Create the FetchedResultsController
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fr, managedObjectContext: stack.context, sectionNameKeyPath: nil, cacheName: nil)
+        
+        
+        FlickrClient.sharedInstance().searchImages(pin: pin, completionHandler:({error in
+            
+            if error == nil {
+                
+                
+                self.stack.save()
+                
+            }
+            
+            
+            
+            
+        }))
+        
         // Do any additional setup after loading the view.
     }
     @IBAction func goBack(_ sender: Any) {
@@ -26,15 +70,19 @@ class AlbumViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-   
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
+
+extension AlbumViewController: NSFetchedResultsControllerDelegate {
+    
+    func executeSearch() {
+        if let fc = fetchedResultsController {
+            do {
+                try fc.performFetch()
+            } catch let e as NSError {
+                print("Error while trying to perform a search: \n\(e)\n\(fetchedResultsController)")
+            }
+        }
+    }
+    
+}
+
