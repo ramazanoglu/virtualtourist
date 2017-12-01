@@ -144,25 +144,29 @@ class FlickrClient : NSObject {
                 
                 //                let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
                 //                let photoDictionary = photosArray[randomPhotoIndex] as [String: AnyObject]
-                for photoDictionary in photosArray {
-                    
-                    let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
-                    
-                    print(photoTitle)
-                    
-                    /* GUARD: Does our photo have a key for 'url_m'? */
-                    guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
-                        sendError("Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
-                        return
+                self.stack.performBackgroundBatchOperation { (batch) in
+                    for photoDictionary in photosArray {
+                        
+                        let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
+                        
+                        /* GUARD: Does our photo have a key for 'url_m'? */
+                        guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
+                            sendError("Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
+                            return
+                        }
+                        
+                        
+                        
+                        _ = Image(url: imageUrlString, title: photoTitle!, pin: pin, context: self.stack.context)
+                        
                     }
-                    
-                    let image = Image(url: imageUrlString, title: photoTitle!, pin: pin, context: self.stack.context)
-                    
-                    
+                    performUIUpdatesOnMain {
+                        completionHandler(nil)
+                    }
+                  
                     
                 }
-                
-                completionHandler(nil)
+               
                 return
             }
         }

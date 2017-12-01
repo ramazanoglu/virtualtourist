@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         checkIfFirstLaunch()
         
-//        stack.autoSave(5)
+       stack.autoSave(30)
 
         return true
     }

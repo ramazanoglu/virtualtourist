@@ -93,7 +93,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vSv-z8-xYm">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vSv-z8-xYm">
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </imageView>
                                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="Pyi-9k-Y8Z">
@@ -116,15 +116,26 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gRW-d7-YQG">
+                                <rect key="frame" x="0.0" y="637" width="375" height="30"/>
+                                <color key="backgroundColor" red="0.81995558375634514" green="0.81995558375634514" blue="0.81995558375634514" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <state key="normal" title="New Collection"/>
+                                <connections>
+                                    <action selector="newCollectionClicked:" destination="3D4-P1-RRd" eventType="touchUpInside" id="md5-hJ-5H7"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="lQp-Fp-4bp" firstAttribute="trailing" secondItem="xfx-i3-Kck" secondAttribute="trailing" id="2yg-aB-OlR"/>
                             <constraint firstItem="vXG-D5-jYG" firstAttribute="trailing" secondItem="xfx-i3-Kck" secondAttribute="trailing" id="5Y2-Fp-f3L"/>
+                            <constraint firstItem="gRW-d7-YQG" firstAttribute="bottom" secondItem="xfx-i3-Kck" secondAttribute="bottom" id="8Sg-HX-BY8"/>
                             <constraint firstItem="lQp-Fp-4bp" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" id="L1E-x9-9zp"/>
                             <constraint firstItem="vXG-D5-jYG" firstAttribute="top" secondItem="fj8-jL-dLk" secondAttribute="bottom" id="L3n-uO-BpH"/>
                             <constraint firstItem="fj8-jL-dLk" firstAttribute="trailing" secondItem="xfx-i3-Kck" secondAttribute="trailing" id="LBA-Oy-4nR"/>
                             <constraint firstItem="vXG-D5-jYG" firstAttribute="width" secondItem="Zni-WX-z3h" secondAttribute="width" id="Mc0-MF-kRm"/>
+                            <constraint firstItem="gRW-d7-YQG" firstAttribute="width" secondItem="Zni-WX-z3h" secondAttribute="width" id="OMb-Gm-wgO"/>
+                            <constraint firstItem="xfx-i3-Kck" firstAttribute="trailing" secondItem="gRW-d7-YQG" secondAttribute="trailing" id="QZR-hh-Qi6"/>
                             <constraint firstItem="fj8-jL-dLk" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" id="Qmj-2E-aNy"/>
                             <constraint firstItem="lQp-Fp-4bp" firstAttribute="top" secondItem="vXG-D5-jYG" secondAttribute="bottom" id="RGw-WY-5Iu"/>
                             <constraint firstItem="vXG-D5-jYG" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" id="c4f-jo-5Lb"/>
@@ -132,12 +143,14 @@
                             <constraint firstItem="fj8-jL-dLk" firstAttribute="width" secondItem="Zni-WX-z3h" secondAttribute="width" id="e3f-dU-wI8"/>
                             <constraint firstItem="fj8-jL-dLk" firstAttribute="top" secondItem="xfx-i3-Kck" secondAttribute="top" id="mcx-Q5-i66"/>
                             <constraint firstItem="lQp-Fp-4bp" firstAttribute="width" secondItem="Zni-WX-z3h" secondAttribute="width" id="s8b-Jb-07a"/>
+                            <constraint firstItem="gRW-d7-YQG" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" id="xIl-Vh-PZw"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="xfx-i3-Kck"/>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="lQp-Fp-4bp" id="PSy-dQ-upz"/>
                         <outlet property="mapView" destination="vXG-D5-jYG" id="9Yz-Sk-cb9"/>
+                        <outlet property="newCollectionButton" destination="gRW-d7-YQG" id="7AN-8a-Qkn"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rqR-PI-yhm" userLabel="First Responder" sceneMemberID="firstResponder"/>
