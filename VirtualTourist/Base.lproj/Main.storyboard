@@ -124,6 +124,12 @@
                                     <action selector="newCollectionClicked:" destination="3D4-P1-RRd" eventType="touchUpInside" id="md5-hJ-5H7"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gsN-qg-qlH">
+                                <rect key="frame" x="20" y="333" width="335" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -138,10 +144,13 @@
                             <constraint firstItem="xfx-i3-Kck" firstAttribute="trailing" secondItem="gRW-d7-YQG" secondAttribute="trailing" id="QZR-hh-Qi6"/>
                             <constraint firstItem="fj8-jL-dLk" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" id="Qmj-2E-aNy"/>
                             <constraint firstItem="lQp-Fp-4bp" firstAttribute="top" secondItem="vXG-D5-jYG" secondAttribute="bottom" id="RGw-WY-5Iu"/>
+                            <constraint firstItem="gsN-qg-qlH" firstAttribute="centerY" secondItem="xfx-i3-Kck" secondAttribute="centerY" id="ajy-e8-hV0"/>
                             <constraint firstItem="vXG-D5-jYG" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" id="c4f-jo-5Lb"/>
                             <constraint firstItem="lQp-Fp-4bp" firstAttribute="bottom" secondItem="xfx-i3-Kck" secondAttribute="bottom" id="cpK-XY-3qU"/>
                             <constraint firstItem="fj8-jL-dLk" firstAttribute="width" secondItem="Zni-WX-z3h" secondAttribute="width" id="e3f-dU-wI8"/>
+                            <constraint firstItem="gsN-qg-qlH" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" constant="20" id="jG0-V7-nX9"/>
                             <constraint firstItem="fj8-jL-dLk" firstAttribute="top" secondItem="xfx-i3-Kck" secondAttribute="top" id="mcx-Q5-i66"/>
+                            <constraint firstItem="xfx-i3-Kck" firstAttribute="trailing" secondItem="gsN-qg-qlH" secondAttribute="trailing" constant="20" id="pQ3-Lr-Duu"/>
                             <constraint firstItem="lQp-Fp-4bp" firstAttribute="width" secondItem="Zni-WX-z3h" secondAttribute="width" id="s8b-Jb-07a"/>
                             <constraint firstItem="gRW-d7-YQG" firstAttribute="leading" secondItem="xfx-i3-Kck" secondAttribute="leading" id="xIl-Vh-PZw"/>
                         </constraints>
@@ -149,6 +158,7 @@
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="lQp-Fp-4bp" id="PSy-dQ-upz"/>
+                        <outlet property="errorLabel" destination="gsN-qg-qlH" id="MhQ-ho-wq2"/>
                         <outlet property="mapView" destination="vXG-D5-jYG" id="9Yz-Sk-cb9"/>
                         <outlet property="newCollectionButton" destination="gRW-d7-YQG" id="7AN-8a-Qkn"/>
                     </connections>

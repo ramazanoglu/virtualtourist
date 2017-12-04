@@ -78,12 +78,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
             print(fetchedResults.count)
             
             if let pin = fetchedResults.first {
-                print("\(pin)")
-                
                 self.selectedPin = pin
             }
         } catch {
-            print("catch")
+            print("catch fetch error")
         }
         
          performSegue(withIdentifier: "albumSegue", sender: self)
@@ -110,15 +108,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
     
     func fetchAllPins() {
-        //clear annotations
-        print("fetchAllPins \(fetchedResultsController.fetchedObjects?.count)")
-        
+       
         mapView.removeAnnotations(mapView.annotations)
         
-        
-        
         for pin in fetchedResultsController.fetchedObjects as! [Pin] {
-            print("pin found lat \(pin.latitude) long \(pin.longitude) page \(pin.lastPage)")
             let annotation = MKPointAnnotation()
             annotation.coordinate.latitude = CLLocationDegrees(pin.latitude)
             annotation.coordinate.longitude = CLLocationDegrees(pin.longitude)
@@ -135,7 +128,7 @@ extension ViewController: NSFetchedResultsControllerDelegate {
             do {
                 try fc.performFetch()
             } catch let e as NSError {
-                print("Error while trying to perform a search: \n\(e)\n\(fetchedResultsController)")
+                print("Error while trying to perform a search: \n\(e)")
             }
         }
     }

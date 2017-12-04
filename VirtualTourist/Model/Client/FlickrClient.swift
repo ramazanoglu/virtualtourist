@@ -16,26 +16,50 @@ class FlickrClient : NSObject {
     
     func searchImages(pin: Pin, completionHandler: @escaping (_ error: String?) -> Void) {
         
-        let methodParameters = [
-            Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
-            Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
-            Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
-            Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
-            Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
-            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
-            Constants.FlickrParameterKeys.Lat: String(pin.latitude),
-            Constants.FlickrParameterKeys.Lon: String(pin.longitude),
-            Constants.FlickrParameterKeys.Page: String(pin.lastPage),
-            Constants.FlickrParameterKeys.PerPage: String("50")
+        queryForPages(pin: pin, completionHandler: ({totalPages, error in
             
-            
-        ]
-        queryImagesByLocation(methodParameters as [String:AnyObject], pin: pin, completionHandler: completionHandler)
+            if error == nil {
+                
+                let requiredPage  = self.getRandomNumber(lastUsedNumber: Int(pin.lastPage), totalPages: totalPages!)
+                
+                if requiredPage < 1
+                {
+                    completionHandler("No Images are found at this location")
+                    return
+                }
+                
+                pin.lastPage = Int16(requiredPage)
+                
+                self.queryImagesByLocation(pin: pin, completionHandler: completionHandler)
+                
+            }
+        }))
+    }
+    
+    func getRandomNumber(lastUsedNumber: Int, totalPages: Int) -> Int {
+        
+        print("Total Pages \(totalPages)")
+        
+        if totalPages == 1 {
+            return 1
+        }
+        
+        if totalPages < 1 {
+            return -1
+        }
+       
+        let randomPage = Int(arc4random_uniform(UInt32(totalPages))) + 1
+        
+        if(randomPage == lastUsedNumber) {
+            return getRandomNumber(lastUsedNumber: lastUsedNumber, totalPages: totalPages)
+        } else {
+            return randomPage
+        }
         
     }
     
+    
     func downloadImage(url: String, completionHandler: @escaping (_ data: Data?,_ error: String?) -> Void) {
-        
         
         let session = URLSession.shared
         let request = URLRequest(url: URL(string: url)!)
@@ -58,9 +82,139 @@ class FlickrClient : NSObject {
         
     }
     
-    private func queryImagesByLocation(_ methodParameters: [String: AnyObject], pin: Pin, completionHandler: @escaping (_ error: String?) -> Void) {
+    private func queryForPages(pin: Pin, completionHandler: @escaping (_ pages: Int?, _ error: String?) -> Void) {
         
-        // create session and request
+        let methodParameters = [
+            Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
+            Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
+            Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
+            Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
+            Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
+            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
+            Constants.FlickrParameterKeys.Lat: String(pin.latitude),
+            Constants.FlickrParameterKeys.Lon: String(pin.longitude),
+            Constants.FlickrParameterKeys.PerPage: String("50")
+            
+        ]
+        
+        runRequest(methodParameters as [String:AnyObject]) { (parsedResult, error) in
+            
+            if error == nil {
+                
+                /* GUARD: Is "photos" key in our result? */
+                guard let photosDictionary = parsedResult![Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+                    completionHandler(nil, "Cannot find keys '\(Constants.FlickrResponseKeys.Photos)' in \(parsedResult)")
+                    return
+                }
+                
+                guard let totalPages = photosDictionary[Constants.FlickrResponseKeys.Pages] as? Int else {
+                    completionHandler(nil, "Cannot find key '\(Constants.FlickrResponseKeys.Pages)' in \(photosDictionary)")
+                    return
+                }
+                                
+                completionHandler(totalPages, nil)
+                return
+                
+            } else {
+                completionHandler(nil, error)
+                return
+            }
+            
+        }
+        
+        
+    }
+    
+    private func queryImagesByLocation(pin: Pin, completionHandler: @escaping (_ error: String?) -> Void) {
+        
+        let methodParameters = [
+            Constants.FlickrParameterKeys.Method: Constants.FlickrParameterValues.SearchMethod,
+            Constants.FlickrParameterKeys.APIKey: Constants.FlickrParameterValues.APIKey,
+            Constants.FlickrParameterKeys.SafeSearch: Constants.FlickrParameterValues.UseSafeSearch,
+            Constants.FlickrParameterKeys.Extras: Constants.FlickrParameterValues.MediumURL,
+            Constants.FlickrParameterKeys.Format: Constants.FlickrParameterValues.ResponseFormat,
+            Constants.FlickrParameterKeys.NoJSONCallback: Constants.FlickrParameterValues.DisableJSONCallback,
+            Constants.FlickrParameterKeys.Lat: String(pin.latitude),
+            Constants.FlickrParameterKeys.Lon: String(pin.longitude),
+            Constants.FlickrParameterKeys.Page: String(pin.lastPage),
+            Constants.FlickrParameterKeys.PerPage: String("50")
+            
+        ]
+        
+        runRequest(methodParameters as [String:AnyObject], completionHandler: ({parsedResult, error in
+            
+            if error == nil {
+                
+                /* GUARD: Did Flickr return an error (stat != ok)? */
+                guard let stat = parsedResult![Constants.FlickrResponseKeys.Status] as? String, stat == Constants.FlickrResponseValues.OKStatus else {
+                    completionHandler("Flickr API returned an error. See error code and message in \(parsedResult)")
+                    return
+                }
+                
+                /* GUARD: Is "photos" key in our result? */
+                guard let photosDictionary = parsedResult![Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
+                    completionHandler("Cannot find keys '\(Constants.FlickrResponseKeys.Photos)' in \(parsedResult)")
+                    return
+                }
+                
+                guard let page = photosDictionary[Constants.FlickrResponseKeys.Page] as? Int else {
+                    completionHandler("Cannot find key '\(Constants.FlickrResponseKeys.Page)' in \(photosDictionary)")
+                    return
+                }
+                
+                
+                print("Page \(page)")
+                
+                
+                /* GUARD: Is the "photo" key in photosDictionary? */
+                guard let photosArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
+                    completionHandler("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(photosDictionary)")
+                    return
+                }
+                
+                if photosArray.count == 0 {
+                    completionHandler("No Photos Found. Search Again.")
+                    return
+                } else {
+                    print("Photo Array Count \(photosArray.count)")
+                    
+                    //                let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
+                    //                let photoDictionary = photosArray[randomPhotoIndex] as [String: AnyObject]
+                    self.stack.performBackgroundBatchOperation { (batch) in
+                        for photoDictionary in photosArray {
+                            
+                            let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
+                            
+                            /* GUARD: Does our photo have a key for 'url_m'? */
+                            guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
+                                completionHandler("Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
+                                return
+                            }
+                            
+                            
+                            
+                            _ = Image(url: imageUrlString, title: photoTitle!, pin: pin, context: self.stack.context)
+                            
+                        }
+                        performUIUpdatesOnMain {
+                            completionHandler(nil)
+                        }
+                        
+                        
+                    }
+                    
+                    
+                }
+            } else {
+                completionHandler(error)
+            }
+            
+        }))
+        
+        
+    }
+    
+    func runRequest(_ methodParameters: [String: AnyObject], completionHandler: @escaping (_ dictionary: [String:AnyObject]?, _ error: String?) -> Void) {
         let session = URLSession.shared
         let request = URLRequest(url: flickrURLFromParameters(methodParameters))
         
@@ -70,7 +224,7 @@ class FlickrClient : NSObject {
             // if an error occurs, print it and re-enable the UI
             func sendError(_ error: String) {
                 print(error)
-                completionHandler(error)
+                completionHandler(nil,error)
                 return
                 
             }
@@ -102,77 +256,17 @@ class FlickrClient : NSObject {
                 return
             }
             
-            /* GUARD: Did Flickr return an error (stat != ok)? */
-            guard let stat = parsedResult[Constants.FlickrResponseKeys.Status] as? String, stat == Constants.FlickrResponseValues.OKStatus else {
-                sendError("Flickr API returned an error. See error code and message in \(parsedResult)")
-                return
-            }
-            
-            /* GUARD: Is "photos" key in our result? */
-            guard let photosDictionary = parsedResult[Constants.FlickrResponseKeys.Photos] as? [String:AnyObject] else {
-                sendError("Cannot find keys '\(Constants.FlickrResponseKeys.Photos)' in \(parsedResult)")
-                return
-            }
-            
-            /* GUARD: Is "pages" key in the photosDictionary? */
-            guard let totalPages = photosDictionary[Constants.FlickrResponseKeys.Pages] as? Int else {
-                sendError("Cannot find key '\(Constants.FlickrResponseKeys.Pages)' in \(photosDictionary)")
-                return
-            }
-            
-            guard let page = photosDictionary[Constants.FlickrResponseKeys.Page] as? Int else {
-                sendError("Cannot find key '\(Constants.FlickrResponseKeys.Page)' in \(photosDictionary)")
-                return
-            }
-            
-            print("Total pages \(totalPages)")
-            
-            print("Page \(page)")
+            completionHandler(parsedResult, nil)
+            return
             
             
-            /* GUARD: Is the "photo" key in photosDictionary? */
-            guard let photosArray = photosDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
-                sendError("Cannot find key '\(Constants.FlickrResponseKeys.Photo)' in \(photosDictionary)")
-                return
-            }
-            
-            if photosArray.count == 0 {
-                sendError("No Photos Found. Search Again.")
-                return
-            } else {
-                print("Photo Array Count \(photosArray.count)")
-                
-                //                let randomPhotoIndex = Int(arc4random_uniform(UInt32(photosArray.count)))
-                //                let photoDictionary = photosArray[randomPhotoIndex] as [String: AnyObject]
-                self.stack.performBackgroundBatchOperation { (batch) in
-                    for photoDictionary in photosArray {
-                        
-                        let photoTitle = photoDictionary[Constants.FlickrResponseKeys.Title] as? String
-                        
-                        /* GUARD: Does our photo have a key for 'url_m'? */
-                        guard let imageUrlString = photoDictionary[Constants.FlickrResponseKeys.MediumURL] as? String else {
-                            sendError("Cannot find key '\(Constants.FlickrResponseKeys.MediumURL)' in \(photoDictionary)")
-                            return
-                        }
-                        
-                        
-                        
-                        _ = Image(url: imageUrlString, title: photoTitle!, pin: pin, context: self.stack.context)
-                        
-                    }
-                    performUIUpdatesOnMain {
-                        completionHandler(nil)
-                    }
-                  
-                    
-                }
-               
-                return
-            }
         }
+        
         
         // start the task!
         task.resume()
+        
+        
     }
     
     

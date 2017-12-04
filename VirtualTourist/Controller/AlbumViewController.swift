@@ -11,6 +11,7 @@ import CoreData
 import MapKit
 
 class AlbumViewController: UIViewController {
+    @IBOutlet weak var errorLabel: UILabel!
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -29,14 +30,11 @@ class AlbumViewController: UIViewController {
             executeSearch()
             
             if fetchedResultsController.fetchedObjects?.count == 0 {
+                print("no data, get new collection")
                 
-                print("no data")
-               
                 newCollectionClicked(nil)
-               
                 
             } else {
-                print("Downloaded \(fetchedResultsController.fetchedObjects?.count)")
                 performUIUpdatesOnMain {
                     self.newCollectionButton.isEnabled = true
                 }
@@ -52,14 +50,11 @@ class AlbumViewController: UIViewController {
         
         newCollectionButton.isEnabled = false
         
-        print("\(pin)")
-        
         let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Image")
         fr.sortDescriptors = []
         fr.predicate = NSPredicate(format: "pin == %@", self.pin)
         // Create the FetchedResultsController
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fr, managedObjectContext: stack.context, sectionNameKeyPath: nil, cacheName: nil)
-        
         
         
         //Add selected pin to map
@@ -77,21 +72,31 @@ class AlbumViewController: UIViewController {
     
     @IBAction func newCollectionClicked(_ sender: Any?) {
         
+        performUIUpdatesOnMain {
+            self.newCollectionButton.isEnabled = false
+            self.errorLabel.text = ""
+        }
+        
         for image in fetchedResultsController.fetchedObjects as! [Image]{
             self.stack.context.delete(image)
         }
-        
-        
-        print("Item count after removal \(fetchedResultsController.fetchedObjects?.count)")
         
         FlickrClient.sharedInstance().searchImages(pin: pin, completionHandler:({error in
             
             if error == nil {
                 
-                    self.stack.save()
-                    self.executeSearch()
-                    self.collectionView.reloadData()
+                self.stack.save()
+                self.executeSearch()
+                self.collectionView.reloadData()
+                self.newCollectionButton.isEnabled = true
+                
+            } else {
+                
+                performUIUpdatesOnMain {
+                    self.errorLabel.text = error
                     self.newCollectionButton.isEnabled = true
+
+                }
                 
             }
             
@@ -105,11 +110,6 @@ class AlbumViewController: UIViewController {
         
         dismiss(animated: true, completion: nil)
         
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
 }
@@ -142,30 +142,29 @@ extension AlbumViewController : UICollectionViewDelegate, UICollectionViewDataSo
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCell",
                                                       for: indexPath) as! FlickrCollectionViewCell
         
-        // Configure the cell
-        
         let image  = fetchedResultsController.object(at: indexPath) as! Image
         
         if image.imageData != nil {
-            cell.imageView.image = UIImage(data: (image.imageData! as Data))
+            
+            performUIUpdatesOnMain {
+                cell.imageView.image = UIImage(data: (image.imageData! as Data))
+                cell.activityIndicator.isHidden = true
+                
+            }
+            
         } else {
             
             FlickrClient.sharedInstance().downloadImage(url: image.url!, completionHandler: ({data, error in
                 
                 if error == nil {
-                    
                     performUIUpdatesOnMain {
                         cell.imageView.image = UIImage(data: data!)
+                        cell.activityIndicator.isHidden = true
                         
                     }
-                    
                     image.imageData = data! as NSData
-                    
                 }
-                
-                
             }))
-            
         }
         
         return cell
@@ -210,7 +209,6 @@ extension AlbumViewController: NSFetchedResultsControllerDelegate {
         self.itemChanges.removeAll()
     }
     
-    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
         self.itemChanges.append((type, indexPath, newIndexPath))
@@ -218,7 +216,7 @@ extension AlbumViewController: NSFetchedResultsControllerDelegate {
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-    
+        
         collectionView?.performBatchUpdates({
             
             for change in self.itemChanges {
